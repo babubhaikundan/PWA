@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a1423">
+    <meta name="description" content="A powerful PWA To-Do List with offline capabilities">
+    <title>Pro Task Manager</title>
+
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Pro%20Task%20Manager%22%2C%22short_name%22%3A%22Tasks%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a1423%22%2C%22theme_color%22%3A%22%2300ffc8%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F446%2F446191.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/446/446191.png">
+
+    <style>
+        /* 🎨 CORE VARIABLES (From Your Context) */
+        :root {
+            --drawer-text-color: #f5f5ff;
+            --drawer-primary-color: #00ffc8;
+            --drawer-bg-color: linear-gradient(180deg, rgba(10, 20, 35, 0.95), rgba(5, 10, 15, 0.9));
+            --drawer-link-hover-bg: rgba(0, 255, 200, 0.08);
+            --app-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ff4757;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--app-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 📱 DRAWER MENU STYLES (Your Mandatory Code) */
+        .drawer-toggle.hidden { transform: translateY(-100px); opacity: 0; pointer-events: none; }
+        .drawer-toggle span { height: 5px; background: var(--drawer-primary-color); border-radius: 3px; display: block; transition: all .25s; }
+        .drawer-toggle.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+        .drawer-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(.2); }
+        .drawer-toggle.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+        
+        .drawer-toggle { position: fixed; top: 18px; left: 15px; z-index: 1100; background: 0 0; border: none; width: 35px; height: 27px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; box-sizing: content-box; transition: transform .4s ease, opacity .4s ease; }
+        
+        .drawer-nav { position: fixed; top: 0; left: 0; height: 100vh; width: 220px; padding-top: 90px; z-index: 1050; background: var(--drawer-bg-color); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transform: translateX(-110%); transition: transform .45s cubic-bezier(.2, 1, .3, 1); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; box-sizing: border-box; }
+        .drawer-nav.active { transform: translateX(0); }
+        .drawer-nav ul { list-style: none; padding: 0; margin: 0; text-align: left; }
+        .drawer-nav a { display: block; padding: 16px 25px; color: var(--drawer-text-color, #f5f5f5); text-decoration: none; font-size: 1.1rem; font-weight: 500; transition: color .2s ease, background .2s ease; }
+        .drawer-nav a:hover { color: var(--drawer-primary-color, #00ffc8); background: var(--drawer-link-hover-bg); }
+        .drawer-nav li { opacity: 0; transform: translateY(20px); transition: opacity .3s ease, transform .3s ease; }
+        .drawer-nav.active li { opacity: 1; transform: translateY(0); }
+        .drawer-nav.active li:nth-child(1) { transition-delay: .1s; }
+        .drawer-nav.active li:nth-child(2) { transition-delay: .15s; }
+        .drawer-nav.active li:nth-child(3) { transition-delay: .2s; }
+        .drawer-nav.active li:nth-child(4) { transition-delay: .25s; }
+        .drawer-nav.active li:nth-child(5) { transition-delay: .3s; }
+        
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 1040; opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility .4s ease; }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        
+        @media (max-width: 520px) { .drawer-nav { width: 70%; } }
+
+        /* 🦶 FOOTER BRANDING STYLES (Your Mandatory Code) */
+        .bawal-footer-wrapper { text-align: center; margin-top: auto; margin-bottom: 9px; padding-top: 20px; border-top: 1px solid #444; position: relative; z-index: 10; }
+        .bawal-footer-link { display: inline-flex; align-items: center; gap: 8px; background: #1A1A1A; padding: 10px 18px; border-radius: 25px; text-decoration: none; box-shadow: 0 4px 10px rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .05); transition: transform .3s ease, box-shadow .3s ease; }
+        .bawal-footer-link:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 10px 25px rgba(0, 0, 0, .4), 0 0 20px rgba(0, 255, 200, .4), 0 0 30px rgba(0, 255, 200, .2); }
+        .bawal-footer-link .dev-text { color: #00ffc8; font-weight: bold; font-size: 15px; text-shadow: 0 0 5px rgba(0, 255, 200, .5); }
+        .bawal-footer-link .name-text { display: flex; align-items: center; gap: 5px; color: #FFD700; font-size: 15px; font-weight: bold; text-shadow: 0 0 5px rgba(255, 215, 0, .5); }
+        .bawal-footer-link img { width: 22px; height: 22px; border-radius: 50%; transition: transform .3s ease; }
+        .bawal-footer-link:hover .telegram-icon { transform: rotate(360deg); }
+        .bawal-footer-link:hover .profile-pic { transform: scale(1.15) rotate(-10deg); }
+
+        /* 📝 APP SPECIFIC STYLES */
+        .app-container {
+            max-width: 600px;
+            width: 90%;
+            margin: 80px auto 30px;
+            flex: 1;
+        }
+
+        .header-section h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #00ffc8, #00b894);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 16px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .add-btn {
+            background: var(--drawer-primary-color);
+            color: #0a1423;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .add-btn:active { transform: scale(0.95); }
+
+        .task-list { list-style: none; padding: 0; margin: 0; }
+
+        .task-item {
+            background: var(--card-bg);
+            margin-bottom: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+
+        .task-item.completed { opacity: 0.6; }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-muted); }
+
+        .task-content { display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--drawer-primary-color);
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s;
+        }
+
+        .task-item.completed .checkbox { background: var(--drawer-primary-color); }
+        .task-item.completed .checkbox::after { content: '✓'; color: #0a1423; font-weight: bold; font-size: 14px; }
+
+        .delete-btn {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover { background: var(--danger); color: white; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Install Button */
+        #install-pwa-btn {
+            display: none; /* Hidden by default */
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px dashed var(--drawer-primary-color);
+            color: var(--drawer-primary-color);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="drawer-overlay" id="drawer-overlay" title="Close menu"></div>
+    <button class="drawer-toggle" id="drawer-toggle" aria-label="Menu Kholo" title="Menu Kholo" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav class="drawer-nav" id="drawer-nav" aria-hidden="true">
+        <ul>
+            <li><a href="https://babubhaikundan.blogspot.com" target="_blank" rel="noopener noreferrer">🤔 About</a></li>
+            <li><a href="https://t.me/kundan_yadav_bot" target="_blank" rel="noopener noreferrer">📞 Contact</a></li>
+            <li><a href="https://www.instagram.com/babubhaikundan" target="_blank" rel="noopener noreferrer">💥 Instagram</a></li>
+            <li id="menu-install-item" style="display:none;">
+                <a href="#" onclick="installPWA(event)">📲 Install App</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="app-container">
+        <div class="header-section">
+            <h1>My Tasks</h1>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Stay organized, stay productive.</p>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="What needs to be done?" onkeypress="handleEnter(event)">
+            <button class="add-btn" onclick="addTask()">ADD</button>
+        </div>
+
+        <ul class="task-list" id="taskList">
+            </ul>
+
+        <button id="install-pwa-btn" onclick="installPWA(event)">
+            📲 Install App on Home Screen
+        </button>
+    </div>
+
+    <div class="bawal-footer-wrapper">
+        <a href="https://babubhaikundan.blogspot.com" target="_blank" class="bawal-footer-link">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="telegram-icon">
+            <span class="dev-text">Developer💀:-</span>
+            <span class="name-text">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 <img src="https://s.tfrbot.com/h/gL5VTi" alt="Kundan" class="profile-pic"></span>
+        </a>
+    </div>
+
+    <script>
+        // --- 1. DRAWER MENU LOGIC (Consolidated) ---
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerNav = document.getElementById('drawer-nav');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+
+        function openDrawer() {
+            drawerToggle.classList.add('active');
+            drawerNav.classList.add('active');
+            drawerOverlay.classList.add('active');
+            drawerToggle.setAttribute('aria-expanded', 'true');
+            drawerNav.setAttribute('aria-hidden', 'false');
+            drawerToggle.classList.remove('hidden');
+        }
+
+        function closeDrawer() {
+            drawerToggle.classList.remove('active');
+            drawerNav.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            drawerToggle.setAttribute('aria-expanded', 'false');
+            drawerNav.setAttribute('aria-hidden', 'true');
+        }
+
+        function setupDrawer() {
+            if(!drawerToggle || !drawerNav || !drawerOverlay) return;
+            
+            drawerToggle.addEventListener('click', () => {
+                const isExpanded = drawerToggle.classList.contains('active');
+                if (isExpanded) closeDrawer();
+                else openDrawer();
+            });
+        }
+
+        function setupClosers() {
+            document.addEventListener('keyup', (e) => {
+                if (e.key === 'Escape' && drawerNav.classList.contains('active')) closeDrawer();
+            });
+            drawerOverlay.addEventListener('click', () => closeDrawer());
+        }
+
+        function setupScrollStopListener() {
+            let scrollTimer;
+            window.addEventListener('scroll', () => {
+                if (drawerNav.classList.contains('active')) return;
+                drawerToggle.classList.add('hidden');
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    drawerToggle.classList.remove('hidden');
+                }, 250);
+            }, { passive: true });
+        }
+
+        // Initialize Drawer
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDrawer();
+            setupClosers();
+            setupScrollStopListener();
+            loadTasks(); // Load To-Do Data
+        });
+
+
+        // --- 2. TO-DO LIST LOGIC ---
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+
+        function handleEnter(e) {
+            if(e.key === 'Enter') addTask();
+        }
+
+        function addTask() {
+            const text = taskInput.value.trim();
+            if (text === '') return;
+
+            const task = {
+                id: Date.now(),
+                text: text,
+                completed: false
+            };
+
+            const tasks = getTasks();
+            tasks.push(task);
+            saveTasks(tasks);
+            renderTask(task);
+            taskInput.value = '';
+        }
+
+        function getTasks() {
+            return JSON.parse(localStorage.getItem('pwa_tasks') || '[]');
+        }
+
+        function saveTasks(tasks) {
+            localStorage.setItem('pwa_tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const tasks = getTasks();
+            tasks.forEach(renderTask);
+        }
+
+        function toggleTask(id) {
+            const tasks = getTasks();
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex > -1) {
+                tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                saveTasks(tasks);
+                
+                // Update UI
+                const li = document.querySelector(`li[data-id="${id}"]`);
+                if(li) li.classList.toggle('completed');
+            }
+        }
+
+        function deleteTask(id) {
+            let tasks = getTasks();
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks(tasks);
+            
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            if(li) {
+                li.style.opacity = '0';
+                li.style.transform = 'translateX(20px)';
+                setTimeout(() => li.remove(), 300);
+            }
+        }
+
+        function renderTask(task) {
+            const li = document.createElement('li');
+            li.className = `task-item ${task.completed ? 'completed' : ''}`;
+            li.dataset.id = task.id;
+            li.innerHTML = `
+                <div class="task-content" onclick="toggleTask(${task.id})">
+                    <div class="checkbox"></div>
+                    <span class="task-text">${escapeHtml(task.text)}</span>
+                </div>
+                <button class="delete-btn" onclick="deleteTask(${task.id})" aria-label="Delete task">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                </button>
+            `;
+            taskList.prepend(li); // Add new tasks to top
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // --- 3. PWA INSTALLATION LOGIC ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-pwa-btn');
+        const menuInstallItem = document.getElementById('menu-install-item');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+            menuInstallItem.style.display = 'block';
+        });
+
+        async function installPWA(e) {
+            e.preventDefault();
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                    menuInstallItem.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        }
+
+        // --- 4. OPTIONAL: SERVICE WORKER REGISTRATION ---
+        // Agar aap 'sw.js' file banate hain to ye kaam karega for Offline mode
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => {
+                    console.log('Service Worker registration skipped (Single File Mode)');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
